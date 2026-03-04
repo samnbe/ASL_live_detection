@@ -144,3 +144,4 @@ Pinky:        17-20
 - [MediaPipe Python Tasks API](https://developers.google.com/mediapipe/solutions/vision/hand_landmarker/python)
 - [OpenCV Documentation](https://docs.opencv.org/)
 - [NVIDIA Deep Learning Institute — Fundamentals of Deep Learning](https://www.nvidia.com/en-us/training/instructor-led-workshops/fundamentals-of-deep-learning/)
+- [Finger Counting in Real-Time Video with OpenCV and MediaPipe — Medium](https://medium.com/@oetalmage16/a-tutorial-on-finger-counting-in-real-time-video-in-python-with-opencv-and-mediapipe-114a988df46a)
