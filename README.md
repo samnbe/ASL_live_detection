@@ -43,17 +43,21 @@ pip install pandas matplotlib --user
 
 ## Project Structure
 ```
-ASL_Proj/
+ASL_live_detection/
 ├── README.md
-├── hand_landmarker.task       # MediaPipe pre-trained hand landmark model (download separately)
-├── asl_model.pth              # Trained ASL classification model
-├── utils.py                   # Model class definition (MyConvBlock)
-├── Webcam.ipynb               # Main webcam notebook
-├── asl_augmentation.ipynb     # Model training notebook
-├── asl_predictions.ipynb      # Model evaluation notebook
+├── hand_landmarker.task            # MediaPipe pre-trained hand landmark model (download separately)
+├── utils.py                        # Model class definition (MyConvBlock)
+├── Webcam.ipynb                    # Main webcam notebook
+├── asl_augmentation.ipynb          # Model training notebook
+├── asl_predictions.ipynb           # Model evaluation notebook
+├── demo_images/                    # Demo screenshots
+├── models/
+│   ├── README.md                   # Model descriptions and results
+│   ├── asl_model1.pth              # Original grayscale model
+│   └── asl_model2.pth              # Color channel model (current)
 └── test_data/
-    ├── sign_mnist_train.csv   # Sign MNIST training data
-    └── sign_mnist_valid.csv   # Sign MNIST validation data
+    ├── sign_mnist_train.csv        # Sign MNIST training data
+    └── sign_mnist_valid.csv        # Sign MNIST validation data
 ```
 
 ---
@@ -62,8 +66,8 @@ ASL_Proj/
 
 ### 1. Clone or download the project
 ```bash
-git clone https://github.com/your-username/asl-webcam.git
-cd asl-webcam
+git clone https://github.com/samnbe/ASL_live_detection.git
+cd ASL_live_detection
 ```
 
 ### 2. Install dependencies
@@ -91,10 +95,11 @@ Open `Webcam.ipynb` and run the cells in order:
 
 | Cell | Description |
 |------|-------------|
-| Cell 1 | Imports and opens the webcam and Model loading — loads trained ASL CNN from `asl_model.pth` |
-| Cell 2 | `landmarker_and_result` class — loads the MediaPipe model |
-| Cell 3 | `draw_landmarks_on_image` drawing function |
-| Cell 4 | `get_hand_crop` function — crops and preprocesses hand region for prediction |
+| Cell 1 | Imports and opens the webcam |
+| Cell 2 | Model loading — loads trained ASL CNN from `asl_model2.pth` |
+| Cell 3 | `landmarker_and_result` class — loads the MediaPipe model |
+| Cell 4 | `draw_landmarks_on_image` drawing function |
+| Cell 5 | `get_hand_crop` function — crops and preprocesses hand region for prediction |
 | Cell 6 | Main webcam loop — runs detection, cropping, prediction and displays the feed |
 | Cell 7 | Cleanup — releases webcam and closes windows |
 
@@ -112,7 +117,7 @@ To quit the webcam feed:
 3. The frame is passed asynchronously to the MediaPipe hand landmarker
 4. When landmarks are detected, 21 key points are mapped onto the hand
 5. Color-coded connections are drawn between landmarks per finger
-6. The hand region is cropped using the landmark bounding box, converted to grayscale, and resized to 28x28
+6. The hand region is cropped using the landmark bounding box and resized to 28x28 — the color (RGB) image is passed directly to the model without grayscale conversion
 7. The cropped image is passed through a CNN to predict the ASL letter
 8. The predicted letter and confidence score are overlaid on the frame
 9. The annotated frame is converted back to BGR and displayed
@@ -120,12 +125,12 @@ To quit the webcam feed:
 ### Landmark Map
 MediaPipe tracks 21 landmarks per hand:
 ```
-Wrist: 0
-Thumb: 1-4
-Index finger: 5-8
+Wrist:         0
+Thumb:         1-4
+Index finger:  5-8
 Middle finger: 9-12
-Ring finger: 13-16
-Pinky: 17-20
+Ring finger:   13-16
+Pinky:         17-20
 ```
 
 ---
@@ -134,17 +139,18 @@ Pinky: 17-20
 - [x] Real-time webcam hand landmark detection
 - [x] Color-coded landmark skeleton per finger
 - [x] ASL letter prediction with confidence score
+- [x] Retrain model on color input (asl_model2)
 - [ ] Improve prediction stability across frames
-- [ ] Retrain model on color or augmented dataset
+- [ ] Collect custom landmark dataset for improved accuracy
+- [ ] Train landmark-based model using MediaPipe coordinates
 - [ ] Word/phrase prediction from letter sequences
-- [ ] Dataset collection tool for custom training
 
 ---
 
 ## Known Issues
 - **Prediction instability** — the predicted letter can change rapidly even when the hand is held still, likely due to minor frame-to-frame variation in the cropped hand region
-- **Grayscale model vs color webcam** — the model was trained on black and white images (Sign MNIST) but the webcam feed is color, which introduces error during preprocessing
-- **Limited letter accuracy** — the model currently predicts approximately 5 out of 24 letters reliably. Note that J and Z are excluded from the dataset as they require motion
+- **Limited letter accuracy** — asl_model2 correctly predicts approximately 8 out of 24 letters reliably across most test conditions. Note that J and Z are excluded from the dataset as they require motion
+- **Training vs webcam data mismatch** — Sign MNIST images are tightly cropped, plain background, and taken under controlled conditions which are very different from a real webcam environment regardless of color
 - **User ASL accuracy** — predictions may also be affected by inexperience with ASL hand positions
 - On some systems, closing the OpenCV window with the `X` button may behave inconsistently — use `q` as a reliable fallback
 - The first few frames may not show landmarks due to the async nature of MediaPipe's live stream mode

@@ -2,7 +2,7 @@ import torch.nn as nn
 
 IMG_HEIGHT = 28
 IMG_WIDTH = 28
-IMG_CHS = 1
+IMG_CHS = 3
 N_CLASSES = 24
 flattened_img_size = 75 * 3 * 3
 
